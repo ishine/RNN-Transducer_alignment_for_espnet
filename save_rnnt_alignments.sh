@@ -6,7 +6,7 @@
 . ./path.sh
 . ./cmd.sh
 
-stage=0        # start from 0 if you need to start from data preparation
+stage=0
 stop_stage=100
 . utils/parse_options.sh || exit 1;
 
