@@ -46,5 +46,12 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
         --utt2cost ${outdir}/utt2cost.dict \
         --thres 0.22 \
         --outdir ${outdir}
+fi
 
+if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
+    echo "Stage 2: Write alignments in kaldi format."
+    python local/calculate_durations.py \
+         --input-alignment-list ${outdir}/out.list \
+         --json ${json} \
+         --output-file ${outdir}/ali.txt
 fi
