@@ -33,9 +33,9 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
         --outdir ${npydir}
 fi
 
+outdir=${expdir}/filt_alignments/`basename ${model}`/`basename ${json} .json`
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     echo "Stage 1: Select diagnal alignments."
-    outdir=${expdir}/filt_alignments/`basename ${model}`/`basename ${json} .json`
     mkdir -p ${outdir}
     find ${npydir} -iname "*.npy" > ${outdir}/in.list
     python local/calculate_cost.py \
