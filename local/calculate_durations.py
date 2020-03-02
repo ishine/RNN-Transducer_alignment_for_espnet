@@ -49,7 +49,7 @@ with open(args.input_alignment_list, 'r') as fr, open(args.output_file, 'w') as 
                 duration = 1
                 smoothing_frame += 1
                 if smoothing_frame > 2:
-                    continue
+                    break
             elif smoothing_frame > 0:
                 x = min(smoothing_frame, duration - 1)
                 duration -= x
