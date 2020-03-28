@@ -49,7 +49,7 @@ with open(args.input_alignment_list, 'r') as fr, open(args.output_file, 'w') as 
                 duration = 1
                 smoothing_frame += 1
                 if smoothing_frame > 2:
-                    continue
+                    break
             elif smoothing_frame > 0:
                 x = min(smoothing_frame, duration - 1)
                 duration -= x
@@ -57,7 +57,7 @@ with open(args.input_alignment_list, 'r') as fr, open(args.output_file, 'w') as 
 
             durations.append(duration)
 
-        if not smoothing_frame > 0:
+        if (not smoothing_frame > 0) and durations[-1] > 0:
             # convert length of 'durations' frome U - 1 to U.
             durations[1] += durations[0]
             del durations[0]
