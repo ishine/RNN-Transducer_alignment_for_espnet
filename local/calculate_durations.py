@@ -76,8 +76,8 @@ with open(args.input_alignment_list, 'r') as fr, open(args.output_file, 'w') as 
         durations[1] += durations[0]
         del durations[0]
         # offset and repeat
-        durations[0] += args.offset
         durations = list(map(lambda x: x*args.deconv_factor, durations))
+        durations[0] += args.offset
         durations[-1] += num_frames - sum(durations)
         # write out
         fw.write(uttid + ' ' + ' ; '.join([t + ' ' + str(d) for t, d in zip(tokens, durations)]) + '\n')
