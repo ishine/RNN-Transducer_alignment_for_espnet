@@ -28,6 +28,10 @@ from espnet.nets.pytorch_backend.transformer.mask import target_mask
 from espnet.nets.pytorch_backend.transformer.plot import PlotAttentionReport
 from espnet.nets.scorers.ctc import CTCPrefixScorer
 
+##################### CPD modified #####################
+import numpy as np
+from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsampling
+########################################################
 
 class E2E(ASRInterface, torch.nn.Module):
     """E2E module.
@@ -433,3 +437,28 @@ class E2E(ASRInterface, torch.nn.Module):
             if isinstance(m, MultiHeadedAttention):
                 ret[name] = m.attn.cpu().numpy()
         return ret
+    
+    ##################### CPD modified #####################
+    def calculate_alignments(self, xs_pad, ilens, ys_pad):
+
+        att_dict = self.calculate_all_attentions(xs_pad, ilens, ys_pad)
+        att_ws = np.concatenate([att_dict[k] for k in att_dict.keys() if "src_attn" in k], axis=1)
+
+        if not hasattr(self, "diag_head_idx"):
+            diagnal_scores = att_ws.max(axis=-2).mean(axis=-1).mean(axis=0)
+            self.diag_head_idx = diagnal_scores.argmax()
+            logging.info("Using src_attn head id: " + str(self.diag_head_idx))
+
+        alignments = []
+        olens = [y[y!=self.ignore_id].size(0) for y in ys_pad]
+        if isinstance(self.encoder.embed, Conv2dSubsampling):
+            for i in range(len(att_ws)):
+                att_w = att_ws[i][self.diag_head_idx]
+                num_frames = ilens[i]
+                num_tokens = olens[i]
+                alignments.append(np.transpose(att_w[:num_tokens+1, :((num_frames - 1) // 2 - 1) // 2]))
+        else:
+            raise(NotImplementedError("Only Conv2dSubsampling is supported."))
+
+        return alignments
+    ########################################################
